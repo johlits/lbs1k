@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<!--
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+     KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
+-->
+<html>
+    <head>
+        <!--
+        Customize this policy to fit your own app's needs. For more guidance, see:
+            https://github.com/apache/cordova-plugin-whitelist/blob/master/README.md#content-security-policy
+        Some notes:
+            * gap: is required only on iOS (when using UIWebView) and is needed for JS->native communication
+            * https://ssl.gstatic.com is required only on Android and is needed for TalkBack to function properly
+            * Disables use of inline scripts in order to mitigate risk of XSS vulnerabilities. To change this:
+                * Enable inline JS: add 'unsafe-inline' to default-src
+        -->
+        <meta name="format-detection" content="telephone=no">
+        <meta name="msapplication-tap-highlight" content="no">
+        <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
+        
+        <link href="jquery-ui.css" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="css/index.css">
+        <title>1000 lbs</title>
+    </head>
+    <body>
+        <div id="container">
+        <div class="app">
+            <div id="tabs" style="height: 100%;">
+                <ul>
+                    <li><a href="#tabs-1">Workout</a></li>
+                    <li id="stattab"><a href="#tabs-2">Statistics</a></li>
+                    <li id="graphtab"><a href="#tabs-3">Graph</a></li>
+                    <li><a href="#tabs-4">History</a></li>
+                </ul>
+                <div id="tabs-1" style="height:calc(100% - 64px);">
+                    <table id="workoutTable" style="width: 100%;">
+                        <tr>
+                            <td>Benchpress</td>
+                            <td><input id="benchpressInput" type="number" name="benchpress" min="1" max="9999" style="width: 100px; height: 40px; text-align: center;"></td>
+                        </tr>
+                        <tr>
+                            <td>Squat</td>
+                            <td><input id="squatInput" type="number" name="squat" min="1" max="9999" style="width: 100px; height: 40px; text-align: center;"></td>
+                        </tr>
+                        <tr>
+                            <td>Deadlift</td>
+                            <td><input id="deadliftInput" type="number" name="deadlift" min="1" max="9999" style="width: 100px; height: 40px; text-align: center;"></td>
+                        </tr>
+                        <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
+                        <tr><td><button onclick="setDate()" type="button" id="dateBox" class="btn btn-success" style="width: 120px; height: 60px; "><span class="btnspan">Date</span></button></td>
+                            <td><button onClick="saveWorkout()" id="saveBox" style="width: 120px; height: 60px; ">ADD WORKOUT</button></td>
+                        </tr>
+                    </table>
+                </div>
+                <div id="tabs-2" style="height:calc(100% - 64px);">
+                    <table id="statsTable" style="width: 100%;">
+                        <tbody>
+                            <tr id="unit_selection">
+                                <td>Unit</td><td><input id="unit_lbs" type="radio" name="unit" value="lbs"> Lbs<br>
+  <input id="unit_kg" type="radio" name="unit" value="kg"> Kg<br></td>
+                            </tr>
+                            <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
+                            <tr>
+                                <td>Last workout</td><td><span id="stat_latestworkout"></span></td>
+                            </tr>
+                            <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
+                            <tr>
+                                <td>Benchpress Pb</td><td><span id="stat_pbbenchpress"></span></td>
+                            </tr>
+                            <tr>
+                                <td>Squat Pb</td><td><span id="stat_pbsquat"></span></td>
+                            </tr>
+                            <tr>
+                                <td>Deadlift Pb</td><td><span id="stat_pbdeadlift"></span></td>
+                            </tr>
+                            <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
+                            <tr style="font-weight: bold;">
+                                <td>Total Pb</td><td><span id="stat_pbtotal"></span></td>
+                            </tr>
+                            <tr style="font-weight: bold;">
+                                <td>Percentage of 1000lbs / 454kg</td><td><span id="stat_percentage1000"></span></td>
+                            </tr>
+                            <tr>
+                                <td>&nbsp;</td><td>&nbsp;</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div id="tabs-3" style="height:calc(100% - 64px);">
+                    <div id="curve_chart" style="width: 100%; height: 100%"></div>
+                </div>
+                <div id="tabs-4" style="height:calc(100% - 64px);">
+                    <table id="historyTable" style="width: 100%">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Exercise</th>
+                                <th>Weight</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        </div>
+        <script type="text/javascript" src="cordova.js"></script>
+        <script type="text/javascript" src="js/jquery-3.2.0.min.js"></script>
+        <script type="text/javascript" src="js/index.js"></script>
+        <script src="external/jquery/jquery.js"></script>
+    <script src="jquery-ui.js"></script>
+    <script>
+
+        $( "#accordion" ).accordion();
+
+        var availableTags = [
+            "ActionScript",
+            "AppleScript",
+            "Asp",
+            "BASIC",
+            "C",
+            "C++",
+            "Clojure",
+            "COBOL",
+            "ColdFusion",
+            "Erlang",
+            "Fortran",
+            "Groovy",
+            "Haskell",
+            "Java",
+            "JavaScript",
+            "Lisp",
+            "Perl",
+            "PHP",
+            "Python",
+            "Ruby",
+            "Scala",
+            "Scheme"
+        ];
+        $( "#autocomplete" ).autocomplete({
+            source: availableTags
+        });
+
+        $( "#button" ).button();
+        $( "#button-icon" ).button({
+            icon: "ui-icon-gear",
+            showLabel: false
+        });
+
+
+
+        $( "#radioset" ).buttonset();
+
+
+
+        $( "#controlgroup" ).controlgroup();
+
+
+
+        $( "#tabs" ).tabs();
+
+
+
+        $( "#dialog" ).dialog({
+            autoOpen: false,
+            width: 400,
+            buttons: [
+                {
+                    text: "Ok",
+                    click: function() {
+                        $( this ).dialog( "close" );
+                    }
+                },
+                {
+                    text: "Cancel",
+                    click: function() {
+                        $( this ).dialog( "close" );
+                    }
+                }
+            ]
+        });
+
+        // Link to open the dialog
+        $( "#dialog-link" ).click(function( event ) {
+            $( "#dialog" ).dialog( "open" );
+            event.preventDefault();
+        });
+
+
+
+        $( "#datepicker" ).datepicker({
+            inline: true
+        });
+
+
+
+        $( "#slider" ).slider({
+            range: true,
+            values: [ 17, 67 ]
+        });
+
+
+
+        $( "#progressbar" ).progressbar({
+            value: 20
+        });
+
+
+
+        $( "#spinner" ).spinner();
+
+
+
+        $( "#menu" ).menu();
+
+
+
+        $( "#tooltip" ).tooltip();
+
+
+
+        $( "#selectmenu" ).selectmenu();
+
+
+        // Hover states on the static widgets
+        $( "#dialog-link, #icons li" ).hover(
+            function() {
+                $( this ).addClass( "ui-state-hover" );
+            },
+            function() {
+                $( this ).removeClass( "ui-state-hover" );
+            }
+        );
+        </script>
+        <script type="text/javascript" src="js/loader.js"></script>
+        <script type="text/javascript" src="js/statistics.js"></script>
+        <script type="text/javascript" src="js/script.js"></script>
+        <script type="text/javascript" src="js/history.js"></script>
+
+    </body>
+</html>
